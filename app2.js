@@ -471,22 +471,5 @@ window.onload = () => {
   showView('hero');
   buildTemplateGrid();
   renderForms();
-
-  // Default sample data
-  document.getElementById('inName').value = 'Alex Morgan';
-  document.getElementById('inTitle').value = 'Senior Product Designer';
-  document.getElementById('inEmail').value = 'alex@example.com';
-  document.getElementById('inPhone').value = '+1 555 123 4567';
-  document.getElementById('inLocation').value = 'San Francisco, CA';
-  document.getElementById('inSummary').value = 'Creative and strategic product designer with 7+ years of experience crafting user-centered digital experiences. Passionate about bridging the gap between design and technology.';
-
-  state.experience.push({ id: 1, company: 'TechCorp Inc.', role: 'Senior Product Designer', start: 'Jan 2021', end: 'Present', desc: 'Led end-to-end design for flagship SaaS product serving 200k+ users. Reduced user onboarding time by 40%.' });
-  state.experience.push({ id: 2, company: 'StartupXYZ', role: 'UX Designer', start: 'Mar 2018', end: 'Dec 2020', desc: 'Designed mobile and web interfaces. Conducted user research, built design systems from scratch.' });
-  state.education.push({ id: 3, school: 'UC Berkeley', degree: 'B.Sc. Human-Computer Interaction', year: '2014 – 2018', gpa: '3.9/4.0' });
-  state.skills = ['Figma', 'Adobe XD', 'User Research', 'Prototyping', 'CSS/HTML', 'React'];
-  state.languages.push({ id: 4, lang: 'English', level: 'Native' });
-  state.languages.push({ id: 5, lang: 'Spanish', level: 'Intermediate' });
-  state.certifications.push({ id: 6, name: 'Google UX Design Certificate', issuer: 'Google', year: '2022' });
-
-  renderForms();
+  render();
 };
