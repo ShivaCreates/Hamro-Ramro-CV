@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>हाम्रो राम्रो CV — Professional Resume Builder</title>
+  <meta name="description" content="Create stunning professional CVs with multiple templates and photo upload." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="nav-brand">
+      <div class="nav-logo">⬡</div>
+      <span>हाम्रो राम्रो <span class="accent">CV</span></span>
+    </div>
+    <div class="nav-links">
+      <a href="#" onclick="showView('hero')" class="nav-link">Home</a>
+      <a href="#" onclick="showView('templates')" class="nav-link">Templates</a>
+      <a href="#" onclick="showView('builder')" class="nav-link">Builder</a>
+    </div>
+    <button class="btn-primary small" onclick="downloadCV()">⬇ Download PDF</button>
+  </nav>
+
+  <!-- HERO -->
+  <div id="view-hero" class="view active">
+    <section class="hero">
+      <div class="hero-glow g1"></div>
+      <div class="hero-glow g2"></div>
+      <div class="hero-content">
+        <div class="badge">✨ Free Professional CV Builder</div>
+        <h1>Build Your <span class="gradient-text">Dream CV</span><br/>in Minutes</h1>
+        <p class="hero-sub">Choose from 5 stunning templates, fill in your details, upload your photo, and download a print-ready PDF — completely free.</p>
+        <div class="hero-btns">
+          <button class="btn-primary large" onclick="showView('templates')">Choose a Template →</button>
+          <button class="btn-outline large" onclick="showView('builder')">Quick Start</button>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong>6</strong> Templates</div>
+          <div class="sep">|</div>
+          <div class="stat"><strong>Free</strong> Forever</div>
+          <div class="sep">|</div>
+          <div class="stat"><strong>PDF</strong> Export</div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="float-card c1">
+          <div class="fc-bar w70"></div>
+          <div class="fc-bar w50"></div>
+          <div class="fc-bar w80"></div>
+        </div>
+        <div class="float-card c2">
+          <div class="fc-circle"></div>
+          <div class="fc-lines">
+            <div class="fc-bar w90"></div>
+            <div class="fc-bar w60"></div>
+          </div>
+        </div>
+        <div class="float-card c3">
+          <div class="fc-bar w60"></div>
+          <div class="fc-bar w40"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- TEMPLATE PICKER -->
+  <div id="view-templates" class="view">
+    <section class="tmpl-section">
+      <div class="sec-header">
+        <h2>Pick Your <span class="gradient-text">Template</span></h2>
+        <p>Each template is crafted for maximum visual impact and ATS compatibility</p>
+      </div>
+      <div class="tmpl-grid" id="templateGrid"></div>
+    </section>
+  </div>
+
+  <!-- BUILDER -->
+  <div id="view-builder" class="view">
+    <div class="builder">
+
+      <!-- LEFT: Form -->
+      <aside class="form-panel">
+        <div class="panel-top">
+          <h3>Your Details</h3>
+          <button class="tmpl-btn" onclick="showView('templates')">⊞ Templates</button>
+        </div>
+        <div class="form-scroll">
+
+          <!-- Photo -->
+          <div class="fsec">
+            <div class="fsec-title">📸 Profile Photo</div>
+            <div class="photo-drop" id="photoDrop" onclick="document.getElementById('photoFile').click()">
+              <input type="file" id="photoFile" accept="image/*" hidden onchange="handlePhoto(event)" />
+              <div id="photoPlaceholder">
+                <div class="photo-icon">🖼</div>
+                <p>Click to upload photo</p>
+                <small>JPG · PNG · WEBP</small>
+              </div>
+              <img id="photoPreview" src="" alt="Profile photo" style="display:none" />
+            </div>
+            <button class="remove-btn" id="removePhotoBtn" style="display:none" onclick="removePhoto(event)">✕ Remove photo</button>
+          </div>
+
+          <!-- Personal -->
+          <div class="fsec">
+            <div class="fsec-title">👤 Personal Info</div>
+            <div class="fgrid">
+              <div class="fg span2">
+                <label>Full Name *</label>
+                <input id="inName" type="text" placeholder="Jane Smith" oninput="render()" />
+              </div>
+              <div class="fg span2">
+                <label>Job Title *</label>
+                <input id="inTitle" type="text" placeholder="Senior UX Designer" oninput="render()" />
+              </div>
+              <div class="fg">
+                <label>Email</label>
+                <input id="inEmail" type="email" placeholder="jane@email.com" oninput="render()" />
+              </div>
+              <div class="fg">
+                <label>Phone</label>
+                <input id="inPhone" type="tel" placeholder="+1 234 567 890" oninput="render()" />
+              </div>
+              <div class="fg">
+                <label>Location</label>
+                <input id="inLocation" type="text" placeholder="New York, USA" oninput="render()" />
+              </div>
+              <div class="fg">
+                <label>Website</label>
+                <input id="inWebsite" type="text" placeholder="yoursite.com" oninput="render()" />
+              </div>
+              <div class="fg">
+                <label>LinkedIn</label>
+                <input id="inLinkedin" type="text" placeholder="linkedin.com/in/jane" oninput="render()" />
+              </div>
+              <div class="fg">
+                <label>GitHub</label>
+                <input id="inGithub" type="text" placeholder="github.com/jane" oninput="render()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div class="fsec">
+            <div class="fsec-title">📝 Summary</div>
+            <textarea id="inSummary" rows="4" placeholder="A brief, compelling overview of your professional background and goals..." oninput="render()"></textarea>
+          </div>
+
+          <!-- Experience -->
+          <div class="fsec">
+            <div class="fsec-title">
+              💼 Experience
+              <button class="add-btn" onclick="addExp()">+ Add</button>
+            </div>
+            <div id="expList"></div>
+          </div>
+
+          <!-- Education -->
+          <div class="fsec">
+            <div class="fsec-title">
+              🎓 Education
+              <button class="add-btn" onclick="addEdu()">+ Add</button>
+            </div>
+            <div id="eduList"></div>
+          </div>
+
+          <!-- Skills -->
+          <div class="fsec">
+            <div class="fsec-title">⚡ Skills</div>
+            <div class="skill-row">
+              <input id="skillInput" type="text" placeholder="e.g. JavaScript, Leadership..." onkeydown="if(event.key==='Enter'){addSkill();event.preventDefault()}" />
+              <button class="add-btn" onclick="addSkill()">Add</button>
+            </div>
+            <div id="skillChips" class="chips"></div>
+          </div>
+
+          <!-- Languages -->
+          <div class="fsec">
+            <div class="fsec-title">
+              🌐 Languages
+              <button class="add-btn" onclick="addLang()">+ Add</button>
+            </div>
+            <div id="langList"></div>
+          </div>
+
+          <!-- Certifications -->
+          <div class="fsec">
+            <div class="fsec-title">
+              🏆 Certifications
+              <button class="add-btn" onclick="addCert()">+ Add</button>
+            </div>
+            <div id="certList"></div>
+          </div>
+
+          <!-- Declaration (used in Simple Classic template) -->
+          <div class="fsec">
+            <div class="fsec-title">📜 Declaration <span style="font-size:0.7rem;font-weight:400;color:#666">(Simple Classic template)</span></div>
+            <textarea id="inDeclaration" rows="3" placeholder="I hereby declare that the above details furnished by me are true to the best of my knowledge and belief." oninput="render()"></textarea>
+          </div>
+
+        </div>
+      </aside>
+
+      <!-- RIGHT: Preview -->
+      <main class="preview-panel">
+        <div class="preview-bar">
+          <span class="preview-label">Live Preview</span>
+          <div class="tmpl-pills" id="tmplPills"></div>
+          <div class="zoom-bar">
+            <button onclick="zoom(-0.1)">−</button>
+            <span id="zoomLabel">90%</span>
+            <button onclick="zoom(0.1)">+</button>
+          </div>
+          <button class="btn-primary small" onclick="downloadCV()">⬇ PDF</button>
+        </div>
+        <div class="cv-viewport" id="cvViewport">
+          <div class="cv-paper" id="cvPaper"></div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js?v=1.1"></script>
+  <script src="app2.js?v=1.1"></script>
+</body>
+</html>
