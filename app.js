@@ -27,7 +27,13 @@ const TEMPLATES = [
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + id).classList.add('active');
-  if (id === 'builder') { buildPills(); render(); }
+  if (id === 'builder') {
+    buildPills();
+    render();
+    if (window.innerWidth <= 768) {
+      switchMobileTab('form');
+    }
+  }
   if (id === 'templates') buildTemplateGrid();
 }
 
@@ -241,3 +247,53 @@ function render() {
 /* ===== HELPERS ===== */
 const e = (v, fb = '') => v ? v.replace(/</g,'&lt;').replace(/>/g,'&gt;') : fb;
 const photoImg = (size = 90, style = '') => state.photo ? `<img src="${state.photo}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;${style}" />` : '';
+
+/* ===== CLEAR ALL DATA ===== */
+function clearAllData() {
+  if (confirm("Are you sure you want to clear all the sample data and start fresh?")) {
+    state.photo = null;
+    state.name = '';
+    state.title = '';
+    state.email = '';
+    state.phone = '';
+    state.location = '';
+    state.website = '';
+    state.linkedin = '';
+    state.github = '';
+    state.summary = '';
+    state.declaration = '';
+    state.experience = [];
+    state.education = [];
+    state.skills = [];
+    state.languages = [];
+    state.certifications = [];
+    
+    // Clear DOM input values
+    const textInputs = ['inName', 'inTitle', 'inEmail', 'inPhone', 'inLocation', 'inWebsite', 'inLinkedin', 'inGithub', 'inSummary', 'inDeclaration'];
+    textInputs.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    
+    // Clear photo upload preview
+    const photoPreview = document.getElementById('photoPreview');
+    const photoPlaceholder = document.getElementById('photoPlaceholder');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const photoFile = document.getElementById('photoFile');
+    if (photoPreview) photoPreview.style.display = 'none';
+    if (photoPlaceholder) photoPlaceholder.style.display = 'block';
+    if (removePhotoBtn) removePhotoBtn.style.display = 'none';
+    if (photoFile) photoFile.value = '';
+    
+    // Clear skill input
+    const skillInput = document.getElementById('skillInput');
+    if (skillInput) skillInput.value = '';
+    
+    // Re-render forms and CV
+    renderForms();
+    render();
+    if (typeof showToast === 'function') {
+      showToast('✨ All sample data cleared! Start entering your details.');
+    }
+  }
+}

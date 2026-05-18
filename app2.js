@@ -261,13 +261,181 @@ function renderCV() {
   const renderers = { modern: tmplModern, classic: tmplClassic, minimal: tmplMinimal, bold: tmplBold, elegant: tmplElegant, simple: tmplSimple };
   const fn = renderers[state.template] || tmplModern;
   paper.innerHTML = fn(state);
-  paper.style.transform = `scale(${zoomScale})`;
   paper.style.width = '210mm';
   paper.style.minHeight = '297mm';
+  
+  if (window.innerWidth <= 768) {
+    autoZoomForMobile();
+  } else {
+    paper.style.transform = `scale(${zoomScale})`;
+    const zoomLabel = document.getElementById('zoomLabel');
+    if (zoomLabel) zoomLabel.textContent = Math.round(zoomScale * 100) + '%';
+  }
 }
 
-/* ===== PDF DOWNLOAD ===== */
-function downloadCV() {
+/* ===== MOBILE RESPONSIVE TABS & SCALING ===== */
+let activeMobileTab = 'form';
+
+function switchMobileTab(tab) {
+  activeMobileTab = tab;
+  const formPanel = document.querySelector('.form-panel');
+  const previewPanel = document.querySelector('.preview-panel');
+  const tabFormBtn = document.getElementById('tab-form');
+  const tabPreviewBtn = document.getElementById('tab-preview');
+  
+  if (tab === 'form') {
+    if (formPanel) formPanel.style.display = 'flex';
+    if (previewPanel) previewPanel.style.display = 'none';
+    if (tabFormBtn) tabFormBtn.classList.add('active');
+    if (tabPreviewBtn) tabPreviewBtn.classList.remove('active');
+  } else {
+    if (formPanel) formPanel.style.display = 'none';
+    if (previewPanel) previewPanel.style.display = 'flex';
+    if (tabFormBtn) tabFormBtn.classList.remove('active');
+    if (tabPreviewBtn) tabPreviewBtn.classList.add('active');
+    
+    // Auto scale preview for mobile viewport
+    setTimeout(autoZoomForMobile, 50);
+  }
+}
+
+function autoZoomForMobile() {
+  if (window.innerWidth <= 768) {
+    const viewport = document.getElementById('cvViewport');
+    const paper = document.getElementById('cvPaper');
+    if (viewport && paper) {
+      const pad = 16 * 2; // smaller padding on mobile
+      const availableWidth = viewport.clientWidth - pad;
+      const paperWidth = 794; // 210mm in pixels at 96 DPI
+      const scale = Math.min(1.0, availableWidth / paperWidth);
+      paper.style.transform = `scale(${scale})`;
+      paper.style.transformOrigin = 'top center';
+      const zoomLabel = document.getElementById('zoomLabel');
+      if (zoomLabel) zoomLabel.textContent = Math.round(scale * 100) + '%';
+    }
+  } else {
+    const paper = document.getElementById('cvPaper');
+    if (paper) {
+      paper.style.transform = `scale(${zoomScale})`;
+      paper.style.transformOrigin = 'top center';
+    }
+    const zoomLabel = document.getElementById('zoomLabel');
+    if (zoomLabel) zoomLabel.textContent = Math.round(zoomScale * 100) + '%';
+  }
+}
+
+// Set resize listener
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) {
+    // Restore default desktop side-by-side view
+    const formPanel = document.querySelector('.form-panel');
+    const previewPanel = document.querySelector('.preview-panel');
+    if (formPanel) formPanel.style.display = 'flex';
+    if (previewPanel) previewPanel.style.display = 'flex';
+  } else {
+    // Re-evaluate mobile view active tab
+    switchMobileTab(activeMobileTab);
+  }
+  autoZoomForMobile();
+});
+
+/* ===== SAVE & DOWNLOAD MODAL CONTROL ===== */
+function openDownloadModal() {
+  document.getElementById('downloadModal').classList.add('show');
+}
+
+function closeDownloadModal() {
+  document.getElementById('downloadModal').classList.remove('show');
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+  const modal = document.getElementById('downloadModal');
+  if (event.target === modal) {
+    closeDownloadModal();
+  }
+};
+
+/* ===== PREMIUM PDF DOWNLOAD (via html2pdf) ===== */
+function downloadPDF() {
+  if (typeof html2pdf === 'undefined') {
+    showToast('⚠️ PDF generator library not loaded. Using print fallback...');
+    downloadCVPrint();
+    return;
+  }
+
+  const element = document.getElementById('cvPaper');
+  const originalTransform = element.style.transform;
+  const originalTransformOrigin = element.style.transformOrigin;
+  
+  // Set scale to 1 for standard rendering size
+  element.style.transform = 'none';
+  element.style.transformOrigin = 'top left';
+
+  const opt = {
+    margin:       0,
+    filename:     `${state.name || 'Resume'}_CV.pdf`,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true, letterRendering: true },
+    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  showToast('⏳ Generating high-quality PDF...');
+
+  html2pdf().from(element).set(opt).save().then(() => {
+    element.style.transform = originalTransform;
+    element.style.transformOrigin = originalTransformOrigin;
+    showToast('✅ PDF downloaded successfully!');
+  }).catch(err => {
+    element.style.transform = originalTransform;
+    element.style.transformOrigin = originalTransformOrigin;
+    console.error('PDF Generation Error:', err);
+    showToast('⚠️ Direct PDF download failed. Opening system print...');
+    downloadCVPrint();
+  });
+}
+
+/* ===== PREMIUM IMAGE DOWNLOAD (via html2canvas for Gallery) ===== */
+function downloadImage() {
+  if (typeof html2canvas === 'undefined') {
+    showToast('⚠️ Image generator library not loaded. Try PDF instead.');
+    return;
+  }
+
+  const element = document.getElementById('cvPaper');
+  const originalTransform = element.style.transform;
+  const originalTransformOrigin = element.style.transformOrigin;
+
+  // Set scale to 1 for standard rendering size
+  element.style.transform = 'none';
+  element.style.transformOrigin = 'top left';
+
+  showToast('⏳ Generating image for gallery...');
+
+  html2canvas(element, {
+    scale: 2.5, // Ultra-sharp image
+    useCORS: true,
+    allowTaint: true,
+    backgroundColor: '#ffffff'
+  }).then(canvas => {
+    element.style.transform = originalTransform;
+    element.style.transformOrigin = originalTransformOrigin;
+    
+    const link = document.createElement('a');
+    link.download = `${state.name || 'Resume'}_CV.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('✅ Image saved to your gallery/downloads!');
+  }).catch(err => {
+    element.style.transform = originalTransform;
+    element.style.transformOrigin = originalTransformOrigin;
+    console.error('Image Generation Error:', err);
+    showToast('❌ Failed to generate image. Try PDF instead.');
+  });
+}
+
+/* ===== PRINT CV (SYSTEM PRINT DIALOG FALLBACK) ===== */
+function downloadCVPrint() {
   const renderers = { modern: tmplModern, classic: tmplClassic, minimal: tmplMinimal, bold: tmplBold, elegant: tmplElegant, simple: tmplSimple };
   const fn = renderers[state.template] || tmplModern;
   const cvHTML = fn(state);
@@ -291,9 +459,11 @@ function downloadCV() {
 /* ===== TOAST ===== */
 function showToast(msg) {
   const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 3000);
+  if (t) {
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
 }
 
 /* ===== INIT ===== */

@@ -7,6 +7,9 @@
   <meta name="description" content="Create stunning professional CVs with multiple templates and photo upload." />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <!-- html2canvas and html2pdf CDNs for direct saving to Gallery or PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 
@@ -20,7 +23,7 @@
       <a href="#" onclick="showView('templates')" class="nav-link">Templates</a>
       <a href="#" onclick="showView('builder')" class="nav-link">Builder</a>
     </div>
-    <button class="btn-primary small" onclick="downloadCV()">⬇ Download PDF</button>
+    <button class="btn-primary small" onclick="openDownloadModal()">⬇ Download CV</button>
   </nav>
 
   <!-- HERO -->
@@ -84,7 +87,10 @@
       <aside class="form-panel">
         <div class="panel-top">
           <h3>Your Details</h3>
-          <button class="tmpl-btn" onclick="showView('templates')">⊞ Templates</button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="clear-btn" onclick="clearAllData()" title="Clear all sample data to start fresh">🗑️ Clear All</button>
+            <button class="tmpl-btn" onclick="showView('templates')">⊞ Templates</button>
+          </div>
         </div>
         <div class="form-scroll">
 
@@ -213,13 +219,61 @@
             <span id="zoomLabel">90%</span>
             <button onclick="zoom(0.1)">+</button>
           </div>
-          <button class="btn-primary small" onclick="downloadCV()">⬇ PDF</button>
+          <button class="btn-primary small" onclick="openDownloadModal()">⬇ Save / Download</button>
         </div>
         <div class="cv-viewport" id="cvViewport">
           <div class="cv-paper" id="cvPaper"></div>
         </div>
       </main>
 
+    </div>
+  </div>
+
+  <!-- Mobile Tab Navigation Bar -->
+  <div class="mobile-tabs">
+    <button class="mobile-tab-btn active" id="tab-form" onclick="switchMobileTab('form')">
+      <span class="tab-icon">✏️</span>
+      <span class="tab-text">Edit Details</span>
+    </button>
+    <button class="mobile-tab-btn" id="tab-preview" onclick="switchMobileTab('preview')">
+      <span class="tab-icon">👁️</span>
+      <span class="tab-text">Preview CV</span>
+    </button>
+  </div>
+
+  <!-- DOWNLOAD OPTIONS MODAL -->
+  <div id="downloadModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4>Save & Download Options</h4>
+        <button class="close-modal" onclick="closeDownloadModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p>Select a format below to save your CV:</p>
+        <div class="download-options-grid">
+          <button class="download-opt-btn pdf" onclick="downloadPDF(); closeDownloadModal()">
+            <div class="opt-icon">📄</div>
+            <div class="opt-info">
+              <strong>Save as PDF</strong>
+              <span>High-quality print ready document</span>
+            </div>
+          </button>
+          <button class="download-opt-btn image" onclick="downloadImage(); closeDownloadModal()">
+            <div class="opt-icon">🖼️</div>
+            <div class="opt-info">
+              <strong>Save to Gallery (Image)</strong>
+              <span>Save directly to your phone photos</span>
+            </div>
+          </button>
+          <button class="download-opt-btn print" onclick="downloadCVPrint(); closeDownloadModal()">
+            <div class="opt-icon">🖨️</div>
+            <div class="opt-info">
+              <strong>Print CV / PDF Fallback</strong>
+              <span>Open system print interface</span>
+            </div>
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
